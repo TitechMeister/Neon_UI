@@ -7,6 +7,7 @@ interface AltimeterData {
 }
 
 const altitude = ref<AltimeterData>();
+const altitudeLogs = ref<AltimeterData[]>([]);
 const isUpdateConstant = ref<boolean>(false);
 
 // component logic
@@ -20,6 +21,17 @@ async function fetchData() {
     }
     console.log('Response received:', response);
     altitude.value = await response.json();
+    // altitude.valueがundefinedでないことを確認
+    if (!altitude.value) {
+      throw new Error('Invalid altitude data received');
+    }
+    altitudeLogs.value.push({
+      altitude: altitude.value.altitude,
+      timestamp: altitude.value.timestamp
+    });
+    if (altitudeLogs.value.length > 10) {
+      altitudeLogs.value.shift(); // Keep only the last 10 logs
+    }
   } catch (error: any) {
     console.error(error.message);
   }
@@ -61,4 +73,10 @@ watch(isUpdateConstant, (newValue) => {
   </label>
   <p v-if="isUpdateConstant">Constant updates are enabled.</p>
   <p v-else>Constant updates are disabled.</p>
+  <h3>Log</h3>
+  <ul>
+    <li v-for="(log, index) in altitudeLogs" :key="index">
+      Altitude: {{ log.altitude }}, Timestamp: {{ log.timestamp }}
+    </li>
+  </ul>
 </template>
