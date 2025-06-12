@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref,watch, onMounted } from 'vue'
 import Altimeter from './devices/Altimeter.vue'
+import AltimeterChart from './devices/AltimeterChart.vue';
 </script>
 
 <template>
@@ -8,4 +9,5 @@ import Altimeter from './devices/Altimeter.vue'
     <p>Welcome to the Neon app!</p>
     <p>Explore the features and enjoy your stay.</p>
   <Altimeter />
+  <!-- <AltimeterChart /> -->
 </template>
