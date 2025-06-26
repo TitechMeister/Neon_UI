@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref,watch, onMounted } from 'vue'
-import { Line } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, PointElement, LineElement, CategoryScale, LinearScale } from 'chart.js';
+import AltimeterChart from './AltimeterChart.vue';
 
-ChartJS.register(Title, Tooltip, Legend, PointElement, LineElement, CategoryScale, LinearScale);
-
-interface AltimeterData {
+export interface AltimeterData {
+  id : number;
   altitude: number;
+  temperature: number;
   timestamp: string;
 }
 
@@ -30,7 +29,9 @@ async function fetchData() {
       throw new Error('Invalid altitude data received');
     }
     altitudeLogs.value.push({
+      id: altitude.value.id,
       altitude: altitude.value.altitude,
+      temperature: altitude.value.temperature,
       timestamp: altitude.value.timestamp
     });
     if (altitudeLogs.value.length > 100) {
@@ -62,46 +63,14 @@ watch(isUpdateConstant, (newValue) => {
   }
 });
 
-// Chart.js setup
-
-const chartData = ref({
-        labels: altitudeLogs.value.map(log => log.timestamp),
-        datasets: [{
-          label: 'データ',
-          data: altitudeLogs.value.map(log => log.altitude),
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
-        }]
-      })
-
-const chartOptions = ref({
-  responsive: true,
-  animation: {
-    duration: 0 // Disable animation for faster updates
-  },
-  responsiveAnimationDuration: 0
-})
-
-// altitudeLogsが変化したらchartDataを更新
-watch(altitudeLogs, (logs) => {
-  chartData.value = {
-    labels: logs.map(log => log.timestamp),
-    datasets: [{
-      label: 'データ',
-      data: logs.map(log => log.altitude),
-      fill: false,
-      borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1
-    }]
-  }
-}, { deep: true })
 
 // declare some reactive state here.
 </script>
 
 <template>
   <h2>Altimeter</h2>
+    <p>Altimeter ID:{{ altitude?.id }}</p>
+    <p>Temperature:{{ altitude?.temperature }}</p>
     <p>Altitude:{{ altitude?.altitude }}</p>
     <p>TimeStamp:{{ altitude?.timestamp }}</p>
   <button @click="fetchData" :disabled="isUpdateConstant">Fetch Altimeter Data</button>
@@ -118,11 +87,6 @@ watch(altitudeLogs, (logs) => {
       Altitude: {{ log.altitude }}, Timestamp: {{ log.timestamp }}
     </li>
   </ul>
-  <h3>Altimeter Chart</h3>
-  <div>
-    <Line
-    :options="chartOptions"
-    :data="chartData"
-  />
-  </div>
+
+  <AltimeterChart :altitudeLogs="altitudeLogs" />
 </template>
