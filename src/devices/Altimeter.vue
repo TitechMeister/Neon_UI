@@ -9,7 +9,13 @@ export interface AltimeterData {
   timestamp: string;
 }
 
+export interface AltimeterLog {
+  download_link: string;
+  timestamp: string;
+}
+
 const altitude = ref<AltimeterData>();
+const altitudeLogDLlink = ref<AltimeterLog>();
 const altitudeLogs = ref<AltimeterData[]>([]);
 const isUpdateConstant = ref<boolean>(false);
 
@@ -40,6 +46,29 @@ async function fetchData() {
   } catch (error: any) {
     console.error(error.message);
   }
+}
+
+async function postData() { 
+  const url = './api/altimeter/log';
+  // Delete the previous log if it exists
+  altitudeLogDLlink.value = undefined;
+  try {
+    const response = await fetch(url, {
+      method: 'POST'
+    });
+    if (!response.ok) {
+      throw new Error(`レスポンスステータス: ${response.status}`);
+    }
+    console.log('Response received:', response);
+    altitudeLogDLlink.value = await response.json();
+    if (!altitudeLogDLlink.value) {
+      throw new Error('Invalid altitude log data received');
+    }
+    console.log('Altitude log download link:', altitudeLogDLlink.value.download_link);
+  } catch (error: any) {
+    console.error(error.message);
+  }
+  
 }
 
 const fetchDataInInterval = () => {
@@ -79,6 +108,11 @@ watch(isUpdateConstant, (newValue) => {
     <input type="checkbox" v-model="isUpdateConstant" />
     Constant Updates
   </label>
+  <div><button @click="postData">Post Altimeter Data</button></div>
+  <div><p v-if="altitudeLogDLlink?.download_link">
+    Download Altimeter Log: 
+    <a :href="altitudeLogDLlink.download_link" target="_blank">Download</a>
+  </p></div>
   <p v-if="isUpdateConstant">Constant updates are enabled.</p>
   <p v-else>Constant updates are disabled.</p>
   <h3>Log</h3>
