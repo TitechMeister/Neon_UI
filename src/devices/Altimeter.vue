@@ -6,7 +6,7 @@ export interface AltimeterData {
   id : number;
   altitude: number;
   temperature: number;
-  timestamp: string;
+  received_time: string;
 }
 
 export interface AltimeterLog {
@@ -38,7 +38,7 @@ async function fetchData() {
       id: altitude.value.id,
       altitude: altitude.value.altitude,
       temperature: altitude.value.temperature,
-      timestamp: altitude.value.timestamp
+      received_time: altitude.value.received_time
     });
     if (altitudeLogs.value.length > 100) {
       altitudeLogs.value.shift(); // Keep only the last 10 logs
@@ -101,7 +101,7 @@ watch(isUpdateConstant, (newValue) => {
     <p>Altimeter ID:{{ altitude?.id }}</p>
     <p>Temperature:{{ altitude?.temperature }}</p>
     <p>Altitude:{{ altitude?.altitude }}</p>
-    <p>TimeStamp:{{ altitude?.timestamp }}</p>
+    <p>RecTime:{{ altitude?.received_time }}</p>
   <button @click="fetchData" :disabled="isUpdateConstant">Fetch Altimeter Data</button>
   <!-- checkbox to toggle constant updates -->
   <label>
@@ -118,7 +118,7 @@ watch(isUpdateConstant, (newValue) => {
   <h3>Log</h3>
   <ul>
     <li v-for="(log, index) in altitudeLogs.slice(-10,-1)" :key="index">
-      Altitude: {{ log.altitude }}, Timestamp: {{ log.timestamp }}
+      Altitude: {{ log.altitude }}, RecTime: {{ log.received_time }}
     </li>
   </ul>
 

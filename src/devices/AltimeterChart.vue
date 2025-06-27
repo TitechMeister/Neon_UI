@@ -8,7 +8,7 @@ ChartJS.register(Title, Tooltip, Legend, PointElement, LineElement, CategoryScal
 const props = defineProps<{ altitudeLogs: AltimeterData[] }>()
 
 const chartData = ref({
-        labels: props.altitudeLogs.map(log => log.timestamp),
+        labels: props.altitudeLogs.map(log => log.received_time),
         datasets: [{
           label: 'データ',
           data: props.altitudeLogs.map(log => log.altitude),
@@ -29,7 +29,7 @@ const chartOptions = ref({
 // altitudeLogsが変化したらchartDataを更新
 watch(props.altitudeLogs, (logs) => {
   chartData.value = {
-    labels: logs.map(log => log.timestamp),
+    labels: logs.map(log => log.received_time),
     datasets: [{
       label: 'データ',
       data: logs.map(log => log.altitude),
