@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
 
+// emitを定義
+const emit = defineEmits<{
+  'altitude-updated': [data: AltimeterData]
+}>()
+
 const altitudeValue = ref<AltimeterData>() // リアクティブな数値（0-100の想定）
 const altitudeLogDLlink = ref<AltimeterLog>();
 const isUpdateConstant = ref<boolean>(false);
@@ -48,7 +53,7 @@ watch(isUpdateConstant, (newValue) => {
 });
 
 async function fetchData() {
-  const url = './api/altimeter';
+  const url = './api/data/altimeter';
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -60,13 +65,21 @@ async function fetchData() {
     }
     altitudeValue.value.altitude = Number(data.altitude.toFixed(2)); // データからaltitudeを取得
     altitudeValue.value.received_time = data.received_time; // データから受信時間を取得
+    
+    // 親コンポーネントに新しいオブジェクトとしてコピーして送信
+    emit('altitude-updated', {
+      id: altitudeValue.value.id,
+      altitude: altitudeValue.value.altitude,
+      received_time: altitudeValue.value.received_time
+    })
+    
   } catch (error: any) {
     console.error(error.message);
   }
 }
 
 async function postData() { 
-  const url = './api/altimeter/log';
+  const url = './api/data/altimeter/log';
   // Delete the previous log if it exists
   altitudeLogDLlink.value = undefined;
   try {
@@ -91,27 +104,35 @@ async function postData() {
 
 <template>
 
+<div class="altimeter-grid">
   <div class="bar-container">
     <div class="bar" :style="{ height: barHeight }"></div>
     <span class="bar-text">{{ altitudeValue?.altitude }}</span>
   </div>
+  <div>
   <button @click="fetchData" :disabled="isUpdateConstant">Fetch Altimeter Data</button>
   <!-- checkbox to toggle constant updates -->
   <label>
     <input type="checkbox" v-model="isUpdateConstant" />
     Constant Updates
   </label>
-  <div><button @click="postData">Post Altimeter Data</button></div>
-  <div><p v-if="altitudeLogDLlink?.download_link">
-    Download Altimeter Log: 
-    <a :href="altitudeLogDLlink.download_link" target="_blank">Download</a>
-  </p></div>
-  <p v-if="isUpdateConstant">Constant updates are enabled.</p>
-  <p v-else>Constant updates are disabled.</p>
-
+    <button @click="postData">Post Altimeter Data</button>
+    <p v-if="altitudeLogDLlink?.download_link">
+      Download Altimeter Log: 
+    <a :href="altitudeLogDLlink.download_link" target="_blank">Download</a></p>
+    <p v-else>
+      Download rink displayed here:
+    </p>
+  </div>
+</div>
 </template>
 
 <style>
+
+.altimeter-grid{
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+}
 
 .bar-container {
   height: 200px; /* 高さを400pxに設定 */
@@ -126,7 +147,7 @@ async function postData() {
   width: 100%;
   background: linear-gradient(to top, #0fc5d9, #4dfff0);
   border-radius: 3px 3px 0 0;
-  transition: height 0.1s ease;
+  transition: height 0.15s ease;
 }
 
 .bar-text {
