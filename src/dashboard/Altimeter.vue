@@ -10,7 +10,7 @@ const altitudeValue = ref<AltimeterData>() // リアクティブな数値（0-10
 const altitudeLogDLlink = ref<AltimeterLog>();
 const isUpdateConstant = ref<boolean>(false);
 const altitudeMax = 8
-const maxHeight = 200 // 最大高さ（px）
+const maxHeight = 300 // 最大高さ（px）
 
 export interface AltimeterData {
   id : number;
@@ -38,7 +38,7 @@ const fetchDataInInterval = () => {
     }
     setTimeout(() => {
       fetchDataInInterval()
-    }, 300)
+    }, 500)
   })
 }
 
@@ -135,7 +135,7 @@ async function postData() {
 }
 
 .bar-container {
-  height: 200px; /* 高さを400pxに設定 */
+  height: 300px; /* 高さを400pxに設定 */
   display: flex;
   align-items: flex-end;
   background-color: rgb(190, 190, 190);

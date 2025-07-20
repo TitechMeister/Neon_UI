@@ -2,7 +2,7 @@
 import { ref,watch, onMounted } from 'vue'
 import Altimeter from './dashboard/Altimeter.vue'
 import GPS from './devices/GPS.vue';
-import Velosity from './devices/Velosity.vue';
+import Velosity from './dashboard/Velosity.vue';
 import Angular from './devices/Angular.vue';
 import AltimeterChart from './dashboard/AltimeterChart.vue';
 import type { AltimeterData } from './dashboard/Altimeter.vue'
@@ -33,7 +33,7 @@ const handleAltitudeUpdate = (newData: AltimeterData) => {
   <!-- <AltimeterChart /> -->
 <div class ="grid">
   <div>One</div>
-  <div>Two</div>
+  <Velosity />
   <Altimeter @altitude-updated="handleAltitudeUpdate" />
   <div>Four</div>
   <div>Five</div>
