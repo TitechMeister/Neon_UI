@@ -2,24 +2,46 @@
 import { ref,watch, onMounted } from 'vue'
 import Altimeter from './dashboard/Altimeter.vue'
 import GPS from './devices/GPS.vue';
-import Velosity from './dashboard/Velosity.vue';
+import Velocity from './dashboard/Velocity.vue';
+import VelocityChart from './dashboard/VelocityChart.vue';
 import Angular from './devices/Angular.vue';
 import AltimeterChart from './dashboard/AltimeterChart.vue';
 import type { AltimeterData } from './dashboard/Altimeter.vue'
+import type { PitotData } from './dashboard/Velocity.vue'
+import Flighttrace from './dashboard/flighttrace.vue';
+import Servo from './dashboard/Servo.vue';
 
 // App.vueで状態を管理
 const altitudeLogs = ref<AltimeterData[]>([])
+const velocityLogs = ref<PitotData[]>([])
 
 // Altimeterから新しいデータを受け取る関数
 const handleAltitudeUpdate = (newData: AltimeterData) => {
+  // newDataが外れ値なら弾く
+  if (newData.altitude < 0 || newData.altitude > 100) {
+    console.warn('Received outlier altitude data:', newData)
+    return
+  }
   altitudeLogs.value.push(newData)
   console.log('Altitude updated:', newData)
   console.log('Total logs count:', altitudeLogs.value.length)
   console.log('Latest 5 logs:', altitudeLogs.value.slice(-5))
   
   // 最新100件のみ保持
-  if (altitudeLogs.value.length > 20) {
+  if (altitudeLogs.value.length > 100) {
     altitudeLogs.value.shift()
+  }
+}
+
+// Velocityから新しいデータを受け取る関数
+const handleVelocityUpdate = (newData: PitotData) => {
+  velocityLogs.value.push(newData)
+  console.log('Velocity updated:', newData)
+  console.log('Total velocity logs count:', velocityLogs.value.length)
+  
+  // 最新100件のみ保持
+  if (velocityLogs.value.length > 100) {
+    velocityLogs.value.shift()
   }
 }
 </script>
@@ -32,11 +54,11 @@ const handleAltitudeUpdate = (newData: AltimeterData) => {
   </header>
   <!-- <AltimeterChart /> -->
 <div class ="grid">
-  <div>One</div>
-  <Velosity />
+  <Flighttrace />
+  <Velocity @velocity-updated="handleVelocityUpdate" />
   <Altimeter @altitude-updated="handleAltitudeUpdate" />
-  <div>Four</div>
-  <div>Five</div>
+  <Servo />
+  <VelocityChart :velocityLogs="velocityLogs" />
   <AltimeterChart :altitudeLogs="altitudeLogs" />
 </div>
 </template>
