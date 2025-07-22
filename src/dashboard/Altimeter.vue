@@ -6,9 +6,14 @@ const emit = defineEmits<{
   'altitude-updated': [data: AltimeterData]
 }>()
 
+// propsでisUpdateConstantを受け取る
+const props = defineProps<{
+  isUpdateConstant: boolean
+}>()
+
 const altitudeValue = ref<AltimeterData>() // リアクティブな数値（0-100の想定）
 const altitudeLogDLlink = ref<AltimeterLog>();
-const isUpdateConstant = ref<boolean>(false);
+// const isUpdateConstant = ref<boolean>(false);
 const altitudeMax = 8
 const maxHeight = 300 // 最大高さ（px）
 
@@ -33,7 +38,7 @@ const barHeight = computed(() => {
 
 const fetchDataInInterval = () => {
   fetchData().then(() => {
-    if (!isUpdateConstant.value) {
+    if (!props.isUpdateConstant) {
       return; // Exit if constant updates are not enabled
     }
     setTimeout(() => {
@@ -46,7 +51,7 @@ onMounted(() => {
   fetchDataInInterval();
 });
 
-watch(isUpdateConstant, (newValue) => {
+watch(props, (newValue) => {
   if (newValue) {
     fetchDataInInterval();
   }
@@ -100,6 +105,11 @@ async function postData() {
   }
   
 }
+
+// 外部からアクセス可能にする
+defineExpose({
+  postData
+})
 </script>
 
 <template>
@@ -112,10 +122,10 @@ async function postData() {
   <div>
   <button @click="fetchData" :disabled="isUpdateConstant">Fetch Altimeter Data</button>
   <!-- checkbox to toggle constant updates -->
-  <label>
+  <!-- <label>
     <input type="checkbox" v-model="isUpdateConstant" />
     Constant Updates
-  </label>
+  </label> -->
     <button @click="postData">Post Altimeter Data</button>
     <p v-if="altitudeLogDLlink?.download_link">
       Download Altimeter Log: 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,watch, onMounted } from 'vue'
+import { ref,watch, onMounted, vModelCheckbox } from 'vue'
 import Altimeter from './dashboard/Altimeter.vue'
 import GPS from './devices/GPS.vue';
 import Velocity from './dashboard/Velocity.vue';
@@ -14,6 +14,12 @@ import Servo from './dashboard/Servo.vue';
 // App.vueで状態を管理
 const altitudeLogs = ref<AltimeterData[]>([])
 const velocityLogs = ref<PitotData[]>([])
+const isUpdateConstant = ref<boolean>(false);
+
+// Altimeterコンポーネントへの参照
+const altimeterRef = ref<InstanceType<typeof Altimeter>>()
+// Velocityコンポーネントへの参照
+const velocityRef = ref<InstanceType<typeof Velocity>>()
 
 // Altimeterから新しいデータを受け取る関数
 const handleAltitudeUpdate = (newData: AltimeterData) => {
@@ -44,19 +50,36 @@ const handleVelocityUpdate = (newData: PitotData) => {
     velocityLogs.value.shift()
   }
 }
+
+// PostDataボタンのクリックハンドラー
+const handlePostData = () => {
+  if (altimeterRef.value) {
+    altimeterRef.value.postData()
+  }
+  if (velocityRef.value) {
+    velocityRef.value.postData()
+  }
+}
+
+
 </script>
 
 <template>
   <header>
     <div id="header">
-      <h1>Neon App</h1>
+      <h1 style="display: inline-block; margin: 0; margin-left: 150px;">Neon App</h1>
+      <div style="float: right; display: flex; align-items: center; height: 100%;">
+        <button style="margin-right: 12px;" @click="handlePostData">PostData</button>
+        <label style="margin-right: 8px;">Constant Update</label>
+        <input type="checkbox" v-model="isUpdateConstant"/>
+      </div>
     </div>
   </header>
   <!-- <AltimeterChart /> -->
 <div class ="grid">
   <Flighttrace />
-  <Velocity @velocity-updated="handleVelocityUpdate" />
-  <Altimeter @altitude-updated="handleAltitudeUpdate" />
+  <Velocity ref="velocityRef" @velocity-updated="handleVelocityUpdate" :is-update-constant="isUpdateConstant" />
+  <Altimeter ref="altimeterRef" @altitude-updated="handleAltitudeUpdate" :is-update-constant="isUpdateConstant" />
   <Servo />
   <VelocityChart :velocityLogs="velocityLogs" />
   <AltimeterChart :altitudeLogs="altitudeLogs" />
