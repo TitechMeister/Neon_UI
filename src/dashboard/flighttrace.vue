@@ -17,6 +17,14 @@ export interface GPSUIData {
   received_time: number;
 }
 
+export interface TargetData {
+  id: number;
+  timestamp: number;
+  target_lon: number;
+  target_lat: number;
+  data: number[];
+}
+
 const gpsData = ref<GPSUIData>({
   unixtime: 0,
   lon: 1362345000,  // 136.2345度 * 10^7 (地図中央付近のテスト座標)
@@ -142,8 +150,48 @@ const getCurrentPositionPixel = () => {
   return latLonToPixel(actualLat, actualLon, mapImageRef.value)
 }
 
-// 画像クリック時の座標を緯度経度に変換（イベントハンドラー用）
-const handleMapClick = (event: MouseEvent) => {
+// 目標座標をAPIに送信する関数
+const sendTargetData = async (lat: number, lon: number) => {
+  try {
+    // 緯度経度を10^7倍して整数に変換
+    const targetLat = Math.round(lat * 10000000)
+    const targetLon = Math.round(lon * 10000000)
+    
+    // 現在時刻をUnixタイムスタンプとして取得
+    const timestamp = Math.floor(Date.now() / 1000)
+    
+    // Dataフィールドを0xFFで埋めた32バイト配列
+    const data = new Array(32).fill(0xFF)
+    
+    const targetData: TargetData = {
+      id: 0xE0,
+      timestamp: timestamp,
+      target_lon: targetLon,
+      target_lat: targetLat,
+      data: data
+    }
+    
+    console.log('送信する目標座標データ:', targetData)
+    
+    const response = await fetch('/api/data/gps/target', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(targetData)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`送信失敗: ${response.status}`)
+    }
+    
+    console.log('目標座標の送信が完了しました')
+    
+  } catch (error) {
+    console.error('目標座標の送信中にエラーが発生しました:', error)
+  }
+}
+const handleMapClick = async (event: MouseEvent) => {
   if (!mapImageRef.value) return
   
   const imageRect = mapImageRef.value.getBoundingClientRect()
@@ -159,6 +207,9 @@ const handleMapClick = (event: MouseEvent) => {
   clickedLatLon.value = coordinates
   
   console.log(`クリック位置: 緯度 ${coordinates.lat.toFixed(6)}, 経度 ${coordinates.lon.toFixed(6)}`)
+  
+  // 目標座標をAPIに送信
+  await sendTargetData(coordinates.lat, coordinates.lon)
   
   return coordinates
 }
