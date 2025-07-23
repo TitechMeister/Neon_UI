@@ -16,24 +16,23 @@ const altitudeLogs = ref<AltimeterData[]>([])
 const velocityLogs = ref<PitotData[]>([])
 const isUpdateConstant = ref<boolean>(false);
 
-// Altimeterコンポーネントへの参照
-const altimeterRef = ref<InstanceType<typeof Altimeter>>()
-// Velocityコンポーネントへの参照
-const velocityRef = ref<InstanceType<typeof Velocity>>()
-
 // Altimeterから新しいデータを受け取る関数
 const handleAltitudeUpdate = (newData: AltimeterData) => {
-  // newDataが外れ値なら弾く
+  console.log(`データ受信 (試行${newData.attemptNumber}回目):`, newData);
+  
+  // newDataが外れ値なら弾く（試行回数は記録するがデータはスキップ）
   if (newData.altitude < 0 || newData.altitude > 100) {
-    console.warn('Received outlier altitude data:', newData)
+    console.warn(`外れ値のためスキップ (試行${newData.attemptNumber}回目):`, newData)
     return
   }
+  
   altitudeLogs.value.push(newData)
+  console.log(`データ受信 (試行${newData.attemptNumber}回目):`, newData)
   console.log('Altitude updated:', newData)
   console.log('Total logs count:', altitudeLogs.value.length)
   console.log('Latest 5 logs:', altitudeLogs.value.slice(-5))
   
-  // 最新100件のみ保持
+  // 最新20件のみ保持（テスト用）
   if (altitudeLogs.value.length > 100) {
     altitudeLogs.value.shift()
   }
@@ -41,23 +40,15 @@ const handleAltitudeUpdate = (newData: AltimeterData) => {
 
 // Velocityから新しいデータを受け取る関数
 const handleVelocityUpdate = (newData: PitotData) => {
+  console.log(`Velocity データ受信 (試行${newData.attemptNumber}回目):`, newData);
+  
   velocityLogs.value.push(newData)
   console.log('Velocity updated:', newData)
   console.log('Total velocity logs count:', velocityLogs.value.length)
   
-  // 最新100件のみ保持
+  // 最新20件のみ保持（テスト用）
   if (velocityLogs.value.length > 100) {
     velocityLogs.value.shift()
-  }
-}
-
-// PostDataボタンのクリックハンドラー
-const handlePostData = () => {
-  if (altimeterRef.value) {
-    altimeterRef.value.postData()
-  }
-  if (velocityRef.value) {
-    velocityRef.value.postData()
   }
 }
 
@@ -69,7 +60,7 @@ const handlePostData = () => {
     <div id="header">
       <h1 style="display: inline-block; margin: 0; margin-left: 150px;">Neon App</h1>
       <div style="float: right; display: flex; align-items: center; height: 100%;">
-        <button style="margin-right: 12px;" @click="handlePostData">PostData</button>
+        <button style="margin-right: 12px;">PostData</button>
         <label style="margin-right: 8px;">Constant Update</label>
         <input type="checkbox" v-model="isUpdateConstant"/>
       </div>
@@ -77,9 +68,9 @@ const handlePostData = () => {
   </header>
   <!-- <AltimeterChart /> -->
 <div class ="grid">
-  <Flighttrace />
-  <Velocity ref="velocityRef" @velocity-updated="handleVelocityUpdate" :is-update-constant="isUpdateConstant" />
-  <Altimeter ref="altimeterRef" @altitude-updated="handleAltitudeUpdate" :is-update-constant="isUpdateConstant" />
+  <Flighttrace :is-update-constant="isUpdateConstant"/>
+  <Velocity @velocity-updated="handleVelocityUpdate" :is-update-constant="isUpdateConstant" />
+  <Altimeter @altitude-updated="handleAltitudeUpdate" :is-update-constant="isUpdateConstant" />
   <Servo />
   <VelocityChart :velocityLogs="velocityLogs" />
   <AltimeterChart :altitudeLogs="altitudeLogs" />

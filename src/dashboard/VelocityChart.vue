@@ -11,7 +11,7 @@ const chartData = ref({
   labels: [] as string[],
   datasets: [{
     label: 'Velocity',
-    data: [] as number[],
+    data: [] as Array<{x: number, y: number}>,
     fill: true,
     backgroundColor: 'rgba(0, 255, 0, 0.3)',
     borderColor: 'rgb(0, 255, 0)',
@@ -19,7 +19,10 @@ const chartData = ref({
   }]
 })
 
-const chartOptions = ref({
+// チャートの再描画を強制するためのキー
+const chartKey = ref(0)
+
+const chartOptions = ref<any>({
   responsive: true,
   maintainAspectRatio: false, // アスペクト比を維持しない
   animation: {
@@ -33,7 +36,23 @@ const chartOptions = ref({
   },
   scales: {
     x: {
-      display: false // X軸（横軸）を非表示
+      type: 'linear' as const,
+      display: false, // X軸を表示
+      ticks: {
+        stepSize: 1,
+        callback: function(value: any) {
+          return `${value}回目`
+        }
+      },
+      min: 1,
+      max: 100
+    },
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Velocity (m/s)'
+      }
     }
   }
 })
@@ -43,23 +62,54 @@ watch(() => props.velocityLogs, (logs) => {
   console.log('Velocity Chart updating with logs:', logs.length, 'items')
   console.log('Latest velocity logs:', logs.slice(-3))
   
+  // attemptNumberをx軸、velocityをy軸とするデータ形式に変換
+  const processedData = logs.map(log => ({
+    x: log.attemptNumber, // 試行回数を横軸に使用
+    y: log.velocity
+  }))
+  
+  console.log('Processed velocity data for chart:', processedData)
+  
   chartData.value = {
-    labels: logs.map(log => new Date(log.timestamp * 1000).toLocaleTimeString()),
+    labels: [], // 座標データを使用するため不要
     datasets: [{
       label: 'Velocity',
-      data: logs.map(log => log.velocity),
+      data: processedData,
       fill: true,
       backgroundColor: 'rgba(0, 255, 0, 0.3)',
       borderColor: 'rgb(0, 255, 0)',
       tension: 0.1
     }]
   }
+  
+  // X軸の範囲を動的に設定（直近10回分を表示）
+  if (logs.length > 0) {
+    const attemptNumbers = logs.map(log => log.attemptNumber)
+    const minAttempt = Math.min(...attemptNumbers)
+    const maxAttempt = Math.max(...attemptNumbers)
+    
+    console.log(`Velocity Attempt range: ${minAttempt} - ${maxAttempt}`)
+    
+    // 直近10回分を表示する範囲を計算
+    const displayRangeStart = Math.max(1, maxAttempt - 99) // 最新から10回分遡る
+    const displayRangeEnd = maxAttempt // 少し余裕を持たせる
+    
+    console.log(`Velocity Display range: ${displayRangeStart} - ${displayRangeEnd}`)
+    
+    // X軸の範囲を設定
+    chartOptions.value.scales.x.min = displayRangeStart
+    chartOptions.value.scales.x.max = displayRangeEnd
+  }
+  
+  // チャートの再描画を強制
+  chartKey.value++
 }, { deep: true, immediate: true })
 </script>
 
 <template>
   <div class="chart-container">
     <Line
+      :key="chartKey"
       :options="chartOptions"
       :data="chartData"
     />

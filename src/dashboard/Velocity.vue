@@ -19,6 +19,7 @@ export interface PitotData {
   pressure_v_raw: number;
   pressure_a_raw: number;
   pressure_s_raw: number;
+  attemptNumber: number; // n回目の取得試行
 }
 
 export interface PitotLog {
@@ -29,6 +30,7 @@ export interface PitotLog {
 // 仮の値（後から実際の値に置き換え）
 const currentVelocity = ref<PitotData>()
 const velocityLogDLlink = ref<PitotLog>();
+let attemptCounter = 0; // データ取得の試行回数カウンター
 
 const maxVelocity = 10 // 最大速度
 
@@ -72,6 +74,8 @@ watch(props, (newValue) => {
 
 async function fetchData() {
   const url = './api/data/pitot';
+  attemptCounter++; // 試行回数をインクリメント
+  
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -80,9 +84,10 @@ async function fetchData() {
     console.log('Response received:', response);
     const data: PitotData = await response.json();
     if (!currentVelocity.value) {
-      currentVelocity.value = { id: data.id, timestamp: 0, temperature: 0, velocity: 0, pressure_v_raw: 0, pressure_a_raw: 0, pressure_s_raw: 0 }; // 初期化
+      currentVelocity.value = { id: data.id, timestamp: 0, temperature: 0, velocity: 0, pressure_v_raw: 0, pressure_a_raw: 0, pressure_s_raw: 0, attemptNumber: attemptCounter }; // 初期化
     }
     currentVelocity.value.velocity = data.velocity;
+    currentVelocity.value.attemptNumber = attemptCounter; // 試行回数を設定
     
     // 親コンポーネントに新しいオブジェクトとしてコピーして送信
     emit('velocity-updated', {
@@ -92,12 +97,14 @@ async function fetchData() {
       velocity: data.velocity,
       pressure_v_raw: data.pressure_v_raw,
       pressure_a_raw: data.pressure_a_raw,
-      pressure_s_raw: data.pressure_s_raw
+      pressure_s_raw: data.pressure_s_raw,
+      attemptNumber: attemptCounter
     })
     
     console.log('Received data:', data);
   } catch (error: any) {
-    console.error(error.message);
+    console.error(`データ取得失敗 (試行${attemptCounter}回目):`, error.message);
+    // エラーの場合はemitしない（データをスキップ）
   }
 }
 

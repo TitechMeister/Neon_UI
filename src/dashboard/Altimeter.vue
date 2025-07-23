@@ -13,14 +13,16 @@ const props = defineProps<{
 
 const altitudeValue = ref<AltimeterData>() // リアクティブな数値（0-100の想定）
 const altitudeLogDLlink = ref<AltimeterLog>();
+let attemptCounter = 0; // データ取得の試行回数カウンター
 // const isUpdateConstant = ref<boolean>(false);
 const altitudeMax = 8
-const maxHeight = 300 // 最大高さ（px）
+const maxHeight = 400 // 最大高さ（px）
 
 export interface AltimeterData {
   id : number;
   altitude: number;
   received_time: string;
+  attemptNumber: number; // n回目の取得試行
 }
 
 export interface AltimeterLog {
@@ -59,6 +61,8 @@ watch(props, (newValue) => {
 
 async function fetchData() {
   const url = './api/data/altimeter';
+  attemptCounter++; // 試行回数をインクリメント
+  
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -66,20 +70,23 @@ async function fetchData() {
     }
     const data: AltimeterData = await response.json();
     if (!altitudeValue.value) {
-      altitudeValue.value = { id: data.id, altitude: 0, received_time: '' }; // 初期化
+      altitudeValue.value = { id: data.id, altitude: 0, received_time: '', attemptNumber: attemptCounter }; // 初期化
     }
     altitudeValue.value.altitude = Number(data.altitude.toFixed(2)); // データからaltitudeを取得
     altitudeValue.value.received_time = data.received_time; // データから受信時間を取得
+    altitudeValue.value.attemptNumber = attemptCounter; // 試行回数を設定
     
     // 親コンポーネントに新しいオブジェクトとしてコピーして送信
     emit('altitude-updated', {
       id: altitudeValue.value.id,
       altitude: altitudeValue.value.altitude,
-      received_time: altitudeValue.value.received_time
+      received_time: altitudeValue.value.received_time,
+      attemptNumber: altitudeValue.value.attemptNumber
     })
     
   } catch (error: any) {
-    console.error(error.message);
+    console.error(`データ取得失敗 (試行${attemptCounter}回目):`, error.message);
+    // エラーの場合はemitしない（データをスキップ）
   }
 }
 
@@ -114,26 +121,26 @@ defineExpose({
 
 <template>
 
-<div class="altimeter-grid">
+<div>
   <div class="bar-container">
     <div class="bar" :style="{ height: barHeight }"></div>
     <span class="bar-text">{{ altitudeValue?.altitude }}</span>
   </div>
-  <div>
-  <button @click="fetchData" :disabled="isUpdateConstant">Fetch Altimeter Data</button>
+  
+  <!-- <button @click="fetchData" :disabled="isUpdateConstant">Fetch Altimeter Data</button> -->
   <!-- checkbox to toggle constant updates -->
   <!-- <label>
     <input type="checkbox" v-model="isUpdateConstant" />
     Constant Updates
   </label> -->
-    <button @click="postData">Post Altimeter Data</button>
+    <!-- <button @click="postData">Post Altimeter Data</button>
     <p v-if="altitudeLogDLlink?.download_link">
       Download Altimeter Log: 
     <a :href="altitudeLogDLlink.download_link" target="_blank">Download</a></p>
     <p v-else>
       Download rink displayed here:
-    </p>
-  </div>
+    </p> -->
+  
 </div>
 </template>
 
@@ -145,7 +152,7 @@ defineExpose({
 }
 
 .bar-container {
-  height: 300px; /* 高さを400pxに設定 */
+  height: 400px; /* 高さを400pxに設定 */
   display: flex;
   align-items: flex-end;
   background-color: rgb(190, 190, 190);
