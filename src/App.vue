@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref,watch, onMounted, vModelCheckbox } from 'vue'
 import Altimeter from './dashboard/Altimeter.vue'
-import GPS from './devices/GPS.vue';
 import Velocity from './dashboard/Velocity.vue';
 import VelocityChart from './dashboard/VelocityChart.vue';
-import Angular from './devices/Angular.vue';
 import AltimeterChart from './dashboard/AltimeterChart.vue';
 import type { AltimeterData } from './dashboard/Altimeter.vue'
 import type { PitotData } from './dashboard/Velocity.vue'
