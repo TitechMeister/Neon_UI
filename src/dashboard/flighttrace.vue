@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
 // 左上緯度経度:35.253495 136.090031
 // 右下緯度経度:35.384179 136.277834
@@ -59,6 +59,15 @@ const clickedLatLon = ref<{lat: number, lon: number} | null>(null)
 
 // GPSログのダウンロードリンク
 const gpsLogDLlink = ref<GPSLog>();
+
+// GPS軌跡データを保存する配列
+const gpsTrail = ref<{lat: number, lon: number, timestamp: number}[]>([])
+
+// 軌跡の最大保持数
+const MAX_TRAIL_POINTS = 10000
+
+// 軌跡の更新頻度
+const trailInterval = 5000
 
 // GPSデータ（10^7倍された整数値）を実際の緯度経度に変換
 const convertGPSToDecimal = (gpsValue: number): number => {
@@ -124,6 +133,18 @@ watch(gpsData, (newData) => {
   if (newData.lat && newData.lon && mapImageRef.value) {
     const actualLat = convertGPSToDecimal(newData.lat)
     const actualLon = convertGPSToDecimal(newData.lon)
+    
+    // 軌跡データに新しい位置を追加
+    gpsTrail.value.push({
+      lat: actualLat,
+      lon: actualLon,
+      timestamp: Date.now()
+    })
+    
+    // 最大保持数を超えた場合は古いデータを削除
+    if (gpsTrail.value.length > MAX_TRAIL_POINTS) {
+      gpsTrail.value.shift()
+    }
     
     currentPositionPixel.value = latLonToPixel(actualLat, actualLon, mapImageRef.value)
     console.log(`現在位置: 緯度 ${actualLat.toFixed(6)}, 経度 ${actualLon.toFixed(6)}`)
@@ -231,6 +252,35 @@ const updateMarkerPosition = () => {
   }
 }
 
+// 軌跡の座標を再計算する関数
+const updateTrailPositions = () => {
+  // リサイズやロード時に軌跡の座標も再計算
+  if (mapImageRef.value && gpsTrail.value.length > 0) {
+    // 軌跡は自動的に再描画されるため、特別な処理は不要
+  }
+}
+
+// 軌跡のSVGパスを生成する計算プロパティ
+const trailPath = computed(() => {
+  if (!mapImageRef.value || gpsTrail.value.length < 2) {
+    return ''
+  }
+  
+  let pathData = ''
+  
+  gpsTrail.value.forEach((point, index) => {
+    const pixelPos = latLonToPixel(point.lat, point.lon, mapImageRef.value!)
+    
+    if (index === 0) {
+      pathData += `M ${pixelPos.x} ${pixelPos.y}`
+    } else {
+      pathData += ` L ${pixelPos.x} ${pixelPos.y}`
+    }
+  })
+  
+  return pathData
+})
+
 // クリック位置マーカーを再計算する関数
 const updateClickedMarkerPosition = () => {
   if (clickedLatLon.value && mapImageRef.value) {
@@ -247,12 +297,14 @@ const updateClickedMarkerPosition = () => {
 const handleResize = () => {
   updateMarkerPosition()
   updateClickedMarkerPosition()
+  updateTrailPositions()
 }
 
 // 画像ロード時の処理
 const handleImageLoad = () => {
   updateMarkerPosition()
   updateClickedMarkerPosition()
+  updateTrailPositions()
 }
 
 const fetchDataInInterval = () => {
@@ -262,7 +314,7 @@ const fetchDataInInterval = () => {
     }
     setTimeout(() => {
       fetchDataInInterval()
-    }, 10)
+    }, trailInterval)
   })
 }
 
@@ -340,6 +392,20 @@ defineExpose({
         @click="handleMapClick"
         @load="handleImageLoad"
       />
+      
+      <!-- GPS軌跡を表示するSVG -->
+      <svg 
+        v-if="gpsTrail.length > 1"
+        class="trail-svg"
+        :width="mapImageRef?.getBoundingClientRect().width || 0"
+        :height="mapImageRef?.getBoundingClientRect().height || 0"
+      >
+        <path
+          :d="trailPath"
+          class="trail-path"
+        />
+      </svg>
+      
       <!-- 現在位置マーカー（赤色） -->
       <div 
         v-if="currentPositionPixel"
@@ -390,6 +456,23 @@ defineExpose({
   height: 100%;
   object-fit: contain;
   cursor: crosshair;
+}
+
+.trail-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.trail-path {
+  fill: none;
+  stroke: #ff6b35;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.8;
 }
 
 .position-marker {
