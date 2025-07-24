@@ -25,6 +25,11 @@ export interface TargetData {
   data: number[];
 }
 
+export interface GPSLog {
+  download_link: string;
+  timestamp: string;
+}
+
 const gpsData = ref<GPSUIData>({
   unixtime: 0,
   lon: 1362345000,  // 136.2345度 * 10^7 (地図中央付近のテスト座標)
@@ -51,6 +56,9 @@ const clickedPositionPixel = ref<{x: number, y: number} | null>(null)
 
 // クリック位置の緯度経度（リサイズ時の再計算用）
 const clickedLatLon = ref<{lat: number, lon: number} | null>(null)
+
+// GPSログのダウンロードリンク
+const gpsLogDLlink = ref<GPSLog>();
 
 // GPSデータ（10^7倍された整数値）を実際の緯度経度に変換
 const convertGPSToDecimal = (gpsValue: number): number => {
@@ -254,7 +262,7 @@ const fetchDataInInterval = () => {
     }
     setTimeout(() => {
       fetchDataInInterval()
-    }, 2000)
+    }, 10)
   })
 }
 
@@ -287,6 +295,34 @@ async function fetchData() {
     console.error('Error fetching GPS data:', error);
   }
 }
+
+// GPSデータのログをPOSTする関数
+async function postData() { 
+  const url = './api/data/gps/log';
+  // 前のログが存在する場合は削除
+  gpsLogDLlink.value = undefined;
+  try {
+    const response = await fetch(url, {
+      method: 'POST'
+    });
+    if (!response.ok) {
+      throw new Error(`レスポンスステータス: ${response.status}`);
+    }
+    console.log('GPS log response received:', response);
+    gpsLogDLlink.value = await response.json();
+    if (!gpsLogDLlink.value) {
+      throw new Error('Invalid GPS log data received');
+    }
+    console.log('GPS log download link:', gpsLogDLlink.value.download_link);
+  } catch (error: any) {
+    console.error('GPS log POST error:', error.message);
+  }
+}
+
+// 外部からアクセス可能にする
+defineExpose({
+  postData
+})
 
 
 </script>

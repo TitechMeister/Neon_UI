@@ -16,6 +16,43 @@ const altitudeLogs = ref<AltimeterData[]>([])
 const velocityLogs = ref<PitotData[]>([])
 const isUpdateConstant = ref<boolean>(false);
 
+// 各コンポーネントへの参照
+const altimeterRef = ref()
+const velocityRef = ref()
+const servoRef = ref()
+const flighttraceRef = ref()
+
+// 全てのメーターのpostDataを実行する関数
+const postAllData = async () => {
+  console.log('全メーターのデータをPOST中...')
+  
+  try {
+    // 各コンポーネントのpostDataメソッドを並行実行
+    const promises = []
+    
+    if (altimeterRef.value?.postData) {
+      promises.push(altimeterRef.value.postData())
+    }
+    
+    if (velocityRef.value?.postData) {
+      promises.push(velocityRef.value.postData())
+    }
+    
+    if (servoRef.value?.postData) {
+      promises.push(servoRef.value.postData())
+    }
+    
+    if (flighttraceRef.value?.postData) {
+      promises.push(flighttraceRef.value.postData())
+    }
+    
+    await Promise.all(promises)
+    console.log('全メーターのデータPOST完了')
+  } catch (error) {
+    console.error('データPOST中にエラーが発生:', error)
+  }
+}
+
 // Altimeterから新しいデータを受け取る関数
 const handleAltitudeUpdate = (newData: AltimeterData) => {
   console.log(`データ受信 (試行${newData.attemptNumber}回目):`, newData);
@@ -60,7 +97,7 @@ const handleVelocityUpdate = (newData: PitotData) => {
     <div id="header">
       <h1 style="display: inline-block; margin: 0; margin-left: 150px;">Neon App</h1>
       <div style="float: right; display: flex; align-items: center; height: 100%;">
-        <button style="margin-right: 12px;">PostData</button>
+        <button style="margin-right: 12px;" @click="postAllData">PostData</button>
         <label style="margin-right: 8px;">Constant Update</label>
         <input type="checkbox" v-model="isUpdateConstant"/>
       </div>
@@ -68,10 +105,10 @@ const handleVelocityUpdate = (newData: PitotData) => {
   </header>
   <!-- <AltimeterChart /> -->
 <div class ="grid">
-  <Flighttrace :is-update-constant="isUpdateConstant"/>
-  <Velocity @velocity-updated="handleVelocityUpdate" :is-update-constant="isUpdateConstant" />
-  <Altimeter @altitude-updated="handleAltitudeUpdate" :is-update-constant="isUpdateConstant" />
-  <Servo />
+  <Flighttrace ref="flighttraceRef" :is-update-constant="isUpdateConstant"/>
+  <Velocity ref="velocityRef" @velocity-updated="handleVelocityUpdate" :is-update-constant="isUpdateConstant" />
+  <Altimeter ref="altimeterRef" @altitude-updated="handleAltitudeUpdate" :is-update-constant="isUpdateConstant" />
+  <Servo ref="servoRef" :is-update-constant="isUpdateConstant"/>
   <VelocityChart :velocityLogs="velocityLogs" />
   <AltimeterChart :altitudeLogs="altitudeLogs" />
 </div>
