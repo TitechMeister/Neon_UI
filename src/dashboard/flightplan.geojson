@@ -1,0 +1,488 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "南ルート（戦略）",
+        "_color": "#00ff00",
+        "_opacity": 1,
+        "_weight": 3
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            136.254344,
+            35.29423
+          ],
+          [
+            136.221363,
+            35.294230
+          ],
+          [
+            136.13619,
+            35.274218
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "北ルート（戦略）",
+        "_color": "#00ff00",
+        "_opacity": 1,
+        "_weight": 3
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            136.254344,
+            35.29423
+          ],
+          [
+            136.232356,
+            35.294230
+          ],
+          [
+            136.174102,
+            35.368138
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "北ルート（最短距離）",
+        "_color": "#00ff00",
+        "_opacity": 1,
+        "_weight": 3,
+        "_dashArray": "1,6"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            136.254344,
+            35.29423
+          ],
+          [
+            136.174102,
+            35.368138
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "中間線",
+        "_color": "#999999",
+        "_opacity": 1,
+        "_weight": 3,
+        "_dashArray": "1,6"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            136.254344,
+            35.29423
+          ],
+          [
+            136.155146,
+            35.321178
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "着水ゾーン",
+        "_markerType": "Circle",
+        "_color": "#00ff00",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#00ff00",
+        "_fillOpacity": 0.5,
+        "_radius": 300
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "南ルート（最短距離）",
+        "_color": "#00ff00",
+        "_opacity": 1,
+        "_weight": 3,
+        "_dashArray": "1,6"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            136.254344,
+            35.29423
+          ],
+          [
+            136.13619,
+            35.274218
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "プラットホーム",
+        "_markerType": "Icon",
+        "_iconUrl": "https://maps.gsi.go.jp/portal/sys/v4/symbols/397.png",
+        "_iconSize": [
+          10,
+          10
+        ],
+        "_iconAnchor": [
+          5,
+          5
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "1km先パイロン",
+        "_markerType": "Icon",
+        "_iconUrl": "https://maps.gsi.go.jp/portal/sys/v4/symbols/397.png",
+        "_iconSize": [
+          10,
+          10
+        ],
+        "_iconAnchor": [
+          5,
+          5
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.24391,
+          35.297069
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "沖島側ポイント",
+        "_markerType": "Icon",
+        "_iconUrl": "https://maps.gsi.go.jp/portal/sys/v4/symbols/397.png",
+        "_iconSize": [
+          10,
+          10
+        ],
+        "_iconAnchor": [
+          5,
+          5
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.13619,
+          35.274218
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "竹生島側ポイント",
+        "_markerType": "Icon",
+        "_iconUrl": "https://maps.gsi.go.jp/portal/sys/v4/symbols/397.png",
+        "_iconSize": [
+          10,
+          10
+        ],
+        "_iconAnchor": [
+          5,
+          5
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.174102,
+          35.368138
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "1km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 1000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "2km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 2000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "3km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 3000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "4km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 4000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "5km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 5000
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "6km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 6000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "7km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 7000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "8km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 8000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "10km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 10000
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "9km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 9000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "11km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 11000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "12km",
+        "_markerType": "Circle",
+        "_color": "#ff0000",
+        "_opacity": 1,
+        "_weight": 1,
+        "_fillColor": "#ff0000",
+        "_fillOpacity": 0,
+        "_radius": 12000,
+        "_dashArray": "4,2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.254344,
+          35.29423
+        ]
+      }
+    }
+  ]
+}
